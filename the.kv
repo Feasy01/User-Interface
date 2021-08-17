@@ -1,0 +1,48 @@
+MainWidget:
+    ImageButton:
+<MainWidget>:
+    id: MainWidget
+    BoxLayout:
+        id:lefty
+        size_hint: 3,1
+        orientation: "vertical"
+        Button:
+            text: "C"
+            size_hint: 1, 1
+
+        ScrollView:
+            size_hint:1, 10
+            name: scroll
+            id: scroll
+            StackLayout:
+                size_hint_y: None
+                height:self.minimum_height
+                id:images
+
+    BoxLayout:
+        id: layout
+        size_hint:5,1
+        orientation: "vertical"
+        FileChooserListView:
+            id:filechooser
+            size_hint:1,10
+        Button:
+            id: select
+            text: "Select"
+            size_hint: None, None
+            size: 75,40
+            pos_hint:{"x":0.4}
+            on_press: MainWidget.selected(filechooser.files)
+            on_press: root.remove()
+    BoxLayout:
+
+        size_hint: 1,1
+
+        orientation: "vertical"
+        Button:
+            text: "C"
+            size_hint: 1,1
+        Button:
+            text: "import"
+            size_hint: 1,4
+            on_press: root.add(list)
