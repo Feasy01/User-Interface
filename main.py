@@ -9,16 +9,16 @@ from kivy.uix.button import Button
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.behaviors import ButtonBehavior
 import weakref
-
+from kivy.core.window import Window
 class ImageButton(ButtonBehavior, Image):
     def __init__(self, **kwargs):
         super(ImageButton,self).__init__(**kwargs)
     # def on_touch_up(self, touch):
     #     # print("mouse down",touch)
-    def on_press(self):
+    def on_press(self,touch):
         print(self.source)
         img = Image(source = self.source, allow_stretch=True , keep_ratio=False, size_hint=(1,1))
-        print(self.parent.parent)
+        print(touch)
         # self.parent.parent.parent.parent.ids.layout.remove_
         # self.parent.parent.parent.parent.ids.layout.add_widget(img)
         self.parent.parent.parent.parent.ids.layout.ids.photo.source=self.source
@@ -27,12 +27,12 @@ class ImageButton(ButtonBehavior, Image):
         # self.ids.layout.add_widget(photo)
     pass
 def on_touch_down(touch):
-         print(touch)
+         return(touch)
 class MainWidget(BoxLayout):
     app = App.get_running_app()
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-    def draw(self):
+
     def selected(self,removeFiles):
         self.add(removeFiles)
     def remove(self):
