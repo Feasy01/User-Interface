@@ -113,10 +113,9 @@ class Draw(Image):
                 # touch.ud["line"].points[7] = touch.y
 class MainWidget(BoxLayout):
     app = App.get_running_app()
-    self.names = []
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-
+        self.names = []
     def selected(self,removeFiles):
         self.add(removeFiles)
 
