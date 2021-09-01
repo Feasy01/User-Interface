@@ -78,6 +78,8 @@ class Draw(Image):
         if (touch.x > self.pos[0] and touch.x< self.pos[0]+self.size[0]):
             self.line[0] = touch.x
             self.line[1] = touch.y
+            for i in self.table:
+                self.canvas.remove(Line(points=i.coords))
             self.table.append(Frame(self.line,"name"))
             new_widget = butt(text=str(self.table[-1].id),size_hint=(1,None),width=300, numbers = self.table[-1].id, coords = self.table[-1].coords)
             self.parent.parent.ids.objects.add_widget(new_widget)
