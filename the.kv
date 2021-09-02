@@ -2,23 +2,14 @@ MainWidget:
     ImageButton:
 <MainWidget>:
     id: MainWidget
-    BoxLayout:
-        id:lefty
-        size_hint: 2,1
-        orientation: "vertical"
-        Button:
-            text: "C"
-            size_hint: 1, 1
-
-        ScrollView:
-            size_hint:1, 10
-            name: scroll
-            id: scroll
-            StackLayout:
-                size_hint_y: None
-                padding: 3
-                height:self.minimum_height
-                id:images
+    ScrollView:
+        size_hint:3, 1
+        name: scroll
+        id: scroll
+        StackLayout:
+            size_hint_y:1, None
+            height:self.minimum_height
+            id:images
 
     BoxLayout:
         id: layout
@@ -40,14 +31,11 @@ MainWidget:
         size_hint: 2,1
 
         orientation: "vertical"
-        ScrollView:
+        Spinner:
+            text: "dodaj etykiety"
             id: list3
-            size_hint: 1,8
-            StackLayout:
-                size_hint_y: None
-                height:self.minimum_height
-                spacing: 5
-                id:classes
+            size_hint: 1,2
+            on_text: root.spinner_clicked(list3.text)
         BoxLayout:
             size_hint:1,1
             TextInput:
