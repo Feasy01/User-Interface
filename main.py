@@ -16,23 +16,85 @@ from kivy.graphics.instructions import InstructionGroup
 from kivy.clock import Clock
 from datetime import datetime
 import itertools
-
-
+import os
 import weakref
 from kivy.core.window import Window
+
+
 def convert(touch,pos,size):
     pass
 class ImageButton(ButtonBehavior, Image):
     def __init__(self, **kwargs):
         super(ImageButton,self).__init__(**kwargs)
     # def on_touch_up(self, touch):
-    #     # print("mouse down",touch)
+    #     # print("mouse down",touch)\
+    def create_txt(self,source,coords,window,size,frames):
+        source =os.path.splitext(source)[0]+'.txt'
+        file = open(source,"w")
+
+        for j,i in enumerate(coords):
+            name = self.parent.parent.parent.names[frames[j].name]
+            xmax=int(i.points[0])
+            xmin = int(i.points[4])
+            ymax = int(i.points[1])
+            ymin = int(i.points[5])
+            width = xmax-xmin
+            height = ymax-ymin
+            xcenter = round((xmax -window[0]-(width/2))/size[0],4)
+            ycenter = round((ymax - window[1] - (height/2))/size[1], 4)
+            width = round(width/size[0],4)
+            height =round(height/size[1],4)
+            width=abs(width)
+            height=abs(height)
+            line = str(name)+" "+str(xcenter)+" "+str(ycenter)+" "+str(width)+" "+str(height)
+            print(line)
+            file.write(line+"\n")
     def on_press(self):
+        source=self.parent.parent.parent.ids.layout.ids.photo.source
         print(self.source)
         img = Image(source = self.source, allow_stretch=True , keep_ratio=False, size_hint=(1,1))
+        if source:
+            source= os.path.splitext(source)[0] + '.txt'
+            self.create_txt(source,self.parent.parent.parent.ids.layout.ids.photo.instructions,self.parent.parent.parent.ids.layout.ids.photo.pos,self.parent.parent.parent.ids.layout.ids.photo.size,self.parent.parent.parent.ids.layout.ids.photo.table)
+            for x in self.parent.parent.parent.ids.layout.ids.photo.instructions:
+                self.parent.parent.parent.ids.layout.ids.photo.canvas.remove(x)
+            self.parent.parent.parent.ids.layout.ids.photo.table.clear()
+            for x in self.parent.parent.parent.ids.layout.ids.photo.buttons:
+                self.parent.parent.parent.ids.objects.remove_widget(x)
+            self.parent.parent.parent.ids.layout.ids.photo.buttons.clear()
+            self.parent.parent.parent.ids.layout.ids.photo.instructions.clear()
         # self.parent.parent.parent.parent.ids.layout.remove_widget()
         # self.parent.parent.parent.parent.ids.layout.add_widget(img)
         self.parent.parent.parent.ids.layout.ids.photo.source=self.source
+        size = self.parent.parent.parent.ids.layout.ids.photo.size
+        pos = self.parent.parent.parent.ids.layout.ids.photo.pos
+        source= os.path.splitext(self.source)[0] + '.txt'
+        if os.path.isfile(source):
+            file = open(source, "r")
+            lines = file.readlines()
+            for line in lines:
+                data = line.split()
+                print(data)
+            for line in lines:
+                data = line.split()
+                label = int(data[0])
+                x = (float(data[1])*size[0])+pos[0]
+                y = float(data[2])*size[1]
+                width = float(data[3])*size[0]
+                height = float(data[4])*size[1]
+                x1 = x-width/2
+                x2 = x+width/2
+                y1 = y-height/2
+                y2 = y+height/2
+                for name, number in self.parent.parent.parent.names.items():  # for name, age in dictionary.iteritems():  (for Python 2.x)
+                    if label == number:
+                        self.parent.parent.parent.ids.layout.ids.photo.table.append(Frame([x1,y2,x1,y1,x2,y1,x2,y2,x1,y2], name))
+                        self.parent.parent.parent.ids.layout.ids.photo.buttons.append(butt(text=str(self.parent.parent.parent.ids.layout.ids.photo.table[-1].name), size_hint=(1, None), width=300,numbers=self.parent.parent.parent.ids.layout.ids.photo.table[-1].id, coords=self.parent.parent.parent.ids.layout.ids.photo.table[-1].coords))
+                        self.parent.parent.parent.ids.objects.add_widget(self.parent.parent.parent.ids.layout.ids.photo.buttons[-1])
+                        self.parent.parent.parent.ids.layout.ids.photo.instructions.append(Line(points=self.parent.parent.parent.ids.layout.ids.photo.table[-1].coords))
+                        self.parent.parent.parent.ids.layout.ids.photo.canvas.add(self.parent.parent.parent.ids.layout.ids.photo.instructions[-1])
+
+
         # print(img.source)
 
         # self.ids.layout.add_widget(photo)
@@ -99,8 +161,8 @@ class Draw(Image):
         if (touch.x > self.pos[0] and touch.x< self.pos[0]+self.size[0]):
             self.line[0] = touch.x
             self.line[1] = touch.y
-            self.table.append(Frame(self.line,"name"))
-            self.buttons.append(butt(text=str(self.table[-1].id),size_hint=(1,None),width=300, numbers = self.table[-1].id, coords = self.table[-1].coords))
+            self.table.append(Frame(self.line, self.parent.parent.current_class))
+            self.buttons.append(butt(text=str(self.table[-1].name),size_hint=(1,None),width=300, numbers = self.table[-1].id, coords = self.table[-1].coords))
             self.parent.parent.ids.objects.add_widget(self.buttons[-1])
             with self.canvas:
                 Color(0,0,1,1)
@@ -141,16 +203,16 @@ class MainWidget(BoxLayout):
     app = App.get_running_app()
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.names = []
-        self.current_calss = ""
+        self.names = {}
+        self.current_class = ""
     def selected(self,removeFiles):
         self.add(removeFiles)
     def getClass(self,text):
-        self.names.append(text)
-        self.ids.list3.values.append(text)
+        self.names[text] = len(self.names)
+        self.ids.list3.values.append(text+" "+str(self.names[text]))
     def spinner_clicked(self,text):
-        self.current_calss = text
-        print(self.current_calss)
+        self.current_class = text
+        print(self.current_class)
 
 
     def getPoints(self):
@@ -181,9 +243,15 @@ class MainWidget(BoxLayout):
     def add(self,list):
         for i,source in enumerate(list):
             try:
-                a = ImageButton(source=source , allow_stretch=True , keep_ratio=False, size_hint=(0.25,None))
-                self.ids.images.add_widget(a)
-                print("added " +str(source))
+                if source.endswith(('jpg', 'png')):
+                    a = ImageButton(source=source , allow_stretch=True , keep_ratio=False, size_hint=(0.25,None))
+                    if os.path.isfile(os.path.splitext(source)[0] + '.txt'):
+                        # line = Line()
+                        with a.canvas:
+                            color: (1,1,1,0.5)
+                        pass
+                    self.ids.images.add_widget(a)
+                    print("added " +str(source))
 
             except:
                 pass

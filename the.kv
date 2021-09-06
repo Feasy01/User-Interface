@@ -7,7 +7,8 @@ MainWidget:
         name: scroll
         id: scroll
         StackLayout:
-            size_hint_y:1, None
+            size_hint_y:None
+            spacing: 5
             height:self.minimum_height
             id:images
 
@@ -35,7 +36,7 @@ MainWidget:
             text: "dodaj etykiety"
             id: list3
             size_hint: 1,2
-            on_text: root.spinner_clicked(list3.text)
+            on_text: root.spinner_clicked( list3.text.split()[0])
         BoxLayout:
             size_hint:1,1
             TextInput:
