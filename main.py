@@ -20,18 +20,28 @@ import os
 import weakref
 from kivy.core.window import Window
 
+#labelling app
+#choose a file directory, consisting of photos and representing labels.
+#add labels manually in the top right corrner, choose photos from the list on the left and start labelling by clicking on the screen and dragging
+#work in progress
+#
+#
+#
+#
 
-def convert(touch,pos,size):
-    pass
+
+#Photo thumbnails
 class ImageButton(ButtonBehavior, Image):
     def __init__(self, **kwargs):
         super(ImageButton,self).__init__(**kwargs)
     # def on_touch_up(self, touch):
     #     # print("mouse down",touch)\
+
+
+    #writes a txt file with boxes coords
     def create_txt(self,source,coords,window,size,frames):
         source =os.path.splitext(source)[0]+'.txt'
         file = open(source,"w")
-
         for j,i in enumerate(coords):
             name = self.parent.parent.parent.names[frames[j].name]
             xmax=int(i.points[0])
@@ -49,6 +59,9 @@ class ImageButton(ButtonBehavior, Image):
             line = str(name)+" "+str(xcenter)+" "+str(ycenter)+" "+str(width)+" "+str(height)
             print(line)
             file.write(line+"\n")
+
+
+    #loads next photo, removes previous labels and adds labels if txt file exists
     def on_press(self):
         source=self.parent.parent.parent.ids.layout.ids.photo.source
         print(self.source)
@@ -104,7 +117,7 @@ def on_touch_down(touch):
 
 
 
-
+#button that indicates added bounding box
 class butt(Button):
     def __init__(self,numbers, coords, **kwargs):
         super(butt, self).__init__(**kwargs)
@@ -115,7 +128,7 @@ class butt(Button):
             if button.numbers == self.numbers:
                 return i
 
-
+    #if pressed, it removes the bounding box
     def on_press(self):
         print(self.numbers)
         line = Line(points = self.coords, width=3)
@@ -132,7 +145,7 @@ class butt(Button):
         self.parent.parent.parent.parent.ids.objects.remove_widget(self)
         # self.parent.remove_widget()
 
-
+#bounding box class
 class Frame():
     id_iter = itertools.count()
     def __init__(self,coords,name):
@@ -140,7 +153,7 @@ class Frame():
         self.name = name
         self.id = next(self.id_iter)
 
-
+#image in the screen center
 class Draw(Image):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -155,7 +168,7 @@ class Draw(Image):
         print(self.canvas.get_group(Line))
         del self.table[number]
 
-
+#drawing bounding boxes
     def on_touch_down(self,touch):
         # if touch.x
         if (touch.x > self.pos[0] and touch.x< self.pos[0]+self.size[0]):
@@ -202,21 +215,37 @@ class Draw(Image):
 class MainWidget(BoxLayout):
     app = App.get_running_app()
     def __init__(self,**kwargs):
-        super().__init__(**kwargs)
+        Window.fullscreen = True
+        Window.set_system_cursor('crosshair')
+        Window.bind(mouse_pos=self.on_mouse_pos)
         self.names = {}
         self.current_class = ""
+        super(MainWidget, self).__init__(**kwargs)
     def selected(self,removeFiles):
         self.add(removeFiles)
+
+    #adding labels
     def getClass(self,text):
         self.names[text] = len(self.names)
         self.ids.list3.values.append(text+" "+str(self.names[text]))
     def spinner_clicked(self,text):
         self.current_class = text
         print(self.current_class)
+    #if oyu hover over a button on the left, it makes the representing bounidng box thicker
+    # def on_mouse_pos(self, *args):
+    #     pos = args[1]
+    #     for butt in self.ids.objects.children:
+    #         print("there are elementsss")
+    #         if butt.collide_point(*pos):
+    #             print("colisiton")
+    #             line = Line(points=butt.coords, width = 5)
+    #             self.ids.layout.ids.photo.canvas.add(line)
+
 
 
     def getPoints(self):
         pass
+    #after you choose directiory, it switches from filechooser to photo display
     def remove(self):
         self.ids.layout.remove_widget(self.ids.select)
         self.ids.layout.remove_widget(self.ids.filechooser)
@@ -231,7 +260,6 @@ class MainWidget(BoxLayout):
         # self.ids.layout.add_widget(img)
     # def btn(self):
     #     self.remove(
-    #     print("lessgo")
     #     self.remove_widget(self)
     def append(self,source):
         photo = Image(source=source)
