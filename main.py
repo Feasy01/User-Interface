@@ -60,7 +60,6 @@ class ImageButton(ButtonBehavior, Image):
             print(line)
             file.write(line+"\n")
 
-
     #loads next photo, removes previous labels and adds labels if txt file exists
     def on_press(self):
         source=self.parent.parent.parent.ids.layout.ids.photo.source
@@ -68,6 +67,7 @@ class ImageButton(ButtonBehavior, Image):
         img = Image(source = self.source, allow_stretch=True , keep_ratio=False, size_hint=(1,1))
         if source:
             source= os.path.splitext(source)[0] + '.txt'
+            source = os.path.splitext(source)[0] + 'txt'
             self.create_txt(source,self.parent.parent.parent.ids.layout.ids.photo.instructions,self.parent.parent.parent.ids.layout.ids.photo.pos,self.parent.parent.parent.ids.layout.ids.photo.size,self.parent.parent.parent.ids.layout.ids.photo.table)
             for x in self.parent.parent.parent.ids.layout.ids.photo.instructions:
                 self.parent.parent.parent.ids.layout.ids.photo.canvas.remove(x)
@@ -87,6 +87,7 @@ class ImageButton(ButtonBehavior, Image):
             lines = file.readlines()
             for line in lines:
                 data = line.split()
+
                 print(data)
             for line in lines:
                 data = line.split()
@@ -215,7 +216,7 @@ class Draw(Image):
 class MainWidget(BoxLayout):
     app = App.get_running_app()
     def __init__(self,**kwargs):
-        Window.fullscreen = True
+        # Window.fullscreen = True
         Window.set_system_cursor('crosshair')
         Window.bind(mouse_pos=self.on_mouse_pos)
         self.names = {}
@@ -232,14 +233,15 @@ class MainWidget(BoxLayout):
         self.current_class = text
         print(self.current_class)
     #if oyu hover over a button on the left, it makes the representing bounidng box thicker
-    # def on_mouse_pos(self, *args):
-    #     pos = args[1]
-    #     for butt in self.ids.objects.children:
-    #         print("there are elementsss")
-    #         if butt.collide_point(*pos):
-    #             print("colisiton")
-    #             line = Line(points=butt.coords, width = 5)
-    #             self.ids.layout.ids.photo.canvas.add(line)
+    def on_mouse_pos(self, *args):
+        pos = args[1]
+        print(pos)
+        for butt in self.ids.objects.children:
+            print("there are elementsss")
+            if butt.collide_point(*pos):
+                print("colisiton")
+                line = Line(points=butt.coords, width = 5)
+                self.ids.layout.ids.photo.canvas.add(line)
 
 
 
